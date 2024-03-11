@@ -5,7 +5,7 @@ import { Theme } from '../../theme';
 
 type ShadowViewProps = {
   children: ReactNode;
-  style: Record<string, string | number>[];
+  style?: Record<string, string | number>[];
 }
 
 export const ShadowView: FC<ShadowViewProps> = ({ children, style }) => {
