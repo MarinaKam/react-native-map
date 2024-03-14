@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { useGlobalTheme } from '../../store';
 import { Text } from '../Text';
+import { Map } from '../../screens/Map';
 
 interface PlaceFormInterface {
 
@@ -35,6 +36,8 @@ export const PlaceForm: FC<PlaceFormInterface> = () => {
           onChangeText={handleChangeTitle}
         />
       </View>
+
+      <Map />
     </ScrollView>
   );
 };
