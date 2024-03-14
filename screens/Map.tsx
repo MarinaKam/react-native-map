@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { View, StyleSheet } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
+import { View, StyleSheet } from 'react-native';
 
 Mapbox.setAccessToken(`${process.env.MAPBOX_PUBLIC_API_KEY}`);
 
@@ -8,7 +8,10 @@ export const Map: FC = () => {
   return (
     <View style={styles.page}>
       <View style={styles.container}>
-        <Mapbox.MapView style={styles.map} />
+        <Mapbox.MapView
+          style={styles.map}
+          styleURL={process.env.MAPBOX_STYLE_URL}
+        />
       </View>
     </View>
   );
