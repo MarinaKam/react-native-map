@@ -18,7 +18,7 @@ export const GlobalThemeContext = createContext<GlobalContextType>({} as GlobalC
 
 export const GlobalThemeProvider = ({ children }: GlobalProviderType) => {
   const defaultTheme: Theme = useTheme();
-  const [theme, setTheme] = useState<ThemeColor>(themeColor);
+  const [theme, setTheme] = useState<ThemeColor>(themeColor || 'primary');
 
   const updateTheme = async (val: ThemeColor) => {
     await AsyncStorage.setItem('theme', val);

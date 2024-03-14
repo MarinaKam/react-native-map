@@ -38,12 +38,13 @@ export default ({ config }: { config: ExpoConfig }): ExpoConfig => {
     },
     extra: {
       ...config.extra,
-      eas: {
-        projectId: 'd7946d85-3b17-4cff-b232-fc78c1b10249'
+      "eas": {
+        "projectId": "d7946d85-3b17-4cff-b232-fc78c1b10249"
       },
       MAPBOX_PUBLIC_API_KEY: process.env.MAPBOX_PUBLIC_API_KEY || '',
       MAPBOX_SECURE_API_KEY: process.env.MAPBOX_SECURE_API_KEY || '',
       GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || '',
+      MAPBOX_STYLE_URL: process.env.MAPBOX_STYLE_URL || '',
     },
     plugins: [
       [
