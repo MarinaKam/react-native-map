@@ -1,3 +1,9 @@
+`npm install -g eas-cli`
+
+### Add EAS build
+
+`eas build:configure`
+
 ### Add vars
 ```
 eas secret:create --name="MAPBOX_PUBLIC_API_KEY" --value="$(grep 'MAPBOX_PUBLIC_API_KEY' .env | cut -d '=' -f2 | tr -d '[:space:]')"
@@ -15,6 +21,4 @@ eas secret:create --name="MAPBOX_STYLE_URL" --value="$(grep 'MAPBOX_STYLE_URL' .
 
 ### Check dependencies versions errors
 `npx expo install --check`
-
-
 

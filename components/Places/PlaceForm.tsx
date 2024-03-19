@@ -4,6 +4,7 @@ import { TextInput } from 'react-native-paper';
 import { useGlobalTheme } from '../../store';
 import { Text } from '../Text';
 import { Map } from '../../screens/Map';
+import { ImagePicker } from './ImagePicker';
 
 interface PlaceFormInterface {
 
@@ -37,6 +38,7 @@ export const PlaceForm: FC<PlaceFormInterface> = () => {
         />
       </View>
 
+      <ImagePicker />
       <Map />
     </ScrollView>
   );
@@ -44,6 +46,7 @@ export const PlaceForm: FC<PlaceFormInterface> = () => {
 
 const styles = StyleSheet.create({
   form: {
+    flex: 1,
     padding: 24,
   },
   label: {

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from 'react-native-paper';
-import { createContext, useState, useEffect, ReactNode, useContext } from 'react';
+import { createContext, useState, useEffect, ReactNode, useContext, useRef } from 'react';
 import { PaletteColorType, Theme, ThemeColor, themeColor } from '../../theme';
 
 type GlobalContextType = {
@@ -18,6 +18,7 @@ export const GlobalThemeContext = createContext<GlobalContextType>({} as GlobalC
 
 export const GlobalThemeProvider = ({ children }: GlobalProviderType) => {
   const defaultTheme: Theme = useTheme();
+  const mounted = useRef(false);
   const [theme, setTheme] = useState<ThemeColor>(themeColor || 'primary');
 
   const updateTheme = async (val: ThemeColor) => {
@@ -26,8 +27,16 @@ export const GlobalThemeProvider = ({ children }: GlobalProviderType) => {
   };
 
   useEffect(() => {
+    if (!mounted?.current) {
+      setTimeout(() => {
+        mounted.current = true;
+      }, 1000);
+
+      return;
+    }
+
     const getTheme = async () => {
-      const storedTheme = await AsyncStorage.getItem('theme');
+      const storedTheme = await AsyncStorage?.getItem?.('theme');
 
       if (!storedTheme) {
         await AsyncStorage.setItem('theme', themeColor);
@@ -38,7 +47,7 @@ export const GlobalThemeProvider = ({ children }: GlobalProviderType) => {
     };
 
     getTheme();
-  }, []);
+  }, [mounted?.current]);
 
   const providerValue = {
     globalTheme: theme,

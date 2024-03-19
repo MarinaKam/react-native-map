@@ -6,18 +6,21 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "ios": {
-        "simulator": true
-      },
       "env": {
         "MAPBOX_PUBLIC_API_KEY": "@secret/MAPBOX_PUBLIC_API_KEY",
         "MAPBOX_SECURE_API_KEY": "@secret/MAPBOX_SECURE_API_KEY",
         "GOOGLE_MAPS_API_KEY": "@secret/GOOGLE_MAPS_API_KEY",
-        "MAPBOX_STYLE_URL": "@secret/MAPBOX_STYLE_URL",
+        "MAPBOX_STYLE_URL": "@secret/MAPBOX_STYLE_URL"
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "MAPBOX_PUBLIC_API_KEY": "@secret/MAPBOX_PUBLIC_API_KEY",
+        "MAPBOX_SECURE_API_KEY": "@secret/MAPBOX_SECURE_API_KEY",
+        "GOOGLE_MAPS_API_KEY": "@secret/GOOGLE_MAPS_API_KEY",
+        "MAPBOX_STYLE_URL": "@secret/MAPBOX_STYLE_URL"
+      }
     },
     "production": {}
   },
