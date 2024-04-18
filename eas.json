@@ -6,6 +6,9 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
       "env": {
         "MAPBOX_PUBLIC_API_KEY": "@secret/MAPBOX_PUBLIC_API_KEY",
         "MAPBOX_SECURE_API_KEY": "@secret/MAPBOX_SECURE_API_KEY",
