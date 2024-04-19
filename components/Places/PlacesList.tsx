@@ -20,6 +20,7 @@ export const PlacesList: FC<PlacesListProps> = ({ places = [] }) => {
 const styles = StyleSheet.create({
   emptyContainer: {
     flex: 1,
+    borderStyle: 'solid',
     justifyContent: 'center',
     alignItems: 'center',
   },

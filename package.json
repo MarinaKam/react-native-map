@@ -16,6 +16,7 @@
     "@react-navigation/native-stack": "^6.9.25",
     "@react-navigation/stack": "^6.3.28",
     "@rnmapbox/maps": "^10.1.19",
+    "@turf/bbox-polygon": "^6.5.0",
     "dotenv": "^16.4.5",
     "expo": "~50.0.17",
     "expo-dev-client": "~3.3.11",

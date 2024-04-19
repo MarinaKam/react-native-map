@@ -57,7 +57,6 @@ export const ImagePicker: FC = () => {
     }
     // TODO: this one doesn't work on ios emulator
     const image = await launchCameraAsync({
-    // const image = await launchImageLibraryAsync({
       mediaTypes: MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [16, 9],

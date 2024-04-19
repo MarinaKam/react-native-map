@@ -6,12 +6,12 @@ import { AddPlace } from '../screens/AddPlace';
 import { Settings } from '../screens/Settings';
 import { useGlobalTheme } from '../store';
 import { theme } from '../theme';
+import { Map } from '../screens/Map';
 
 const Stack = createNativeStackNavigator();
 
 export const StackNavigation = () => {
   const { paletteTheme, palette } = useGlobalTheme();
-
 
   return (
     <Stack.Navigator
@@ -57,6 +57,8 @@ export const StackNavigation = () => {
           component={AddPlace}
           options={{ title: 'Add a New Place' }}
         />
+
+        <Stack.Screen name="Map" component={Map} />
       </Stack.Group>
 
       <Stack.Group screenOptions={{ presentation: 'modal' }}>

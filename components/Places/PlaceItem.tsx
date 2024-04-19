@@ -6,7 +6,7 @@ import { Text } from '../Text';
 
 type PlaceItemProps = {
   place: Place;
-  onSelect: () => void;
+  onSelect?: () => void;
 }
 
 export const PlaceItem: FC<PlaceItemProps> = ({ place, onSelect }) => {
