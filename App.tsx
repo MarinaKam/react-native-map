@@ -6,6 +6,7 @@ import { StackNavigation } from './navigation';
 import { GlobalThemeProvider } from './store';
 import { theme } from './theme';
 import { enableScreens } from 'react-native-screens';
+import { MapProvider } from './store/MapProvider';
 enableScreens();
 
 export default function App() {
@@ -14,9 +15,11 @@ export default function App() {
       <StatusBar style="auto" />
 
       <GlobalThemeProvider>
-        <NavigationContainer>
-          <StackNavigation />
-        </NavigationContainer>
+        <MapProvider>
+          <NavigationContainer>
+            <StackNavigation />
+          </NavigationContainer>
+        </MapProvider>
       </GlobalThemeProvider>
     </PaperProvider>
   );

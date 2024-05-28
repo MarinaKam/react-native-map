@@ -3,8 +3,8 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { useGlobalTheme } from '../../store';
 import { Text } from '../Text';
-import { Map } from '../../screens/Map';
 import { ImagePicker } from './ImagePicker';
+import { LocationPicker } from './LocationPicker';
 
 interface PlaceFormInterface {
 
@@ -39,7 +39,7 @@ export const PlaceForm: FC<PlaceFormInterface> = () => {
       </View>
 
       <ImagePicker />
-      <Map />
+      <LocationPicker />
     </ScrollView>
   );
 };
