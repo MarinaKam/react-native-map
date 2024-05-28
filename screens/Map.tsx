@@ -1,8 +1,12 @@
-import { FC, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import MapboxGL, { Location, UserTrackingMode } from '@rnmapbox/maps';
+import { FC, useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { View, StyleSheet, Animated, Alert } from 'react-native';
+import MapboxGL, { UserTrackingMode } from '@rnmapbox/maps';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { IconButton } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Text } from '../components';
+import { useGlobalTheme } from '../store';
+import { useMap } from '../store/MapProvider';
 // import bboxPolygon from '@turf/bbox-polygon';
 
 MapboxGL.setAccessToken(`${process.env.MAPBOX_PUBLIC_API_KEY}`);
@@ -26,17 +30,18 @@ interface Pin {
   longitude: number;
 }
 
-export const Map: FC<{ pins?: Pin[] }> = ({ pins = [] }) => {
-  const [location, setLocation] = useState<Location>();
+export const Map: FC = () => {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { pins, deletePin, onUserLocationUpdate } = useMap();
+  const [mapPin, setMapPin] = useState<Pin | null>(null);
   const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
-  const [mapPins, setMapPins] = useState<Pin[]>(pins);
+  const { paletteTheme } = useGlobalTheme();
+  const [isMapReady, setMapReady] = useState(false);
+  const [opacityAnimation] = useState(new Animated.Value(0));
 
   const handlePinSelect = (pin: Pin) => {
     setSelectedPin(pin);
-  };
-
-  const onUserLocationUpdate = (newLocation: Location) => {
-    setLocation(newLocation);
   };
 
   const handleMapInteraction = () => {
@@ -50,17 +55,63 @@ export const Map: FC<{ pins?: Pin[] }> = ({ pins = [] }) => {
       longitude: coordinates[0]
     }
 
-    setMapPins([...mapPins, newPin]);
+    setMapPin(newPin);
   };
 
+  const handleDeleteLastPin = () => {
+    deletePin();
+    setSelectedPin(null);
+  };
+
+  const savePickedLocation = useCallback(() => {
+    if (!mapPin) {
+      Alert.alert('No location picked!', 'You have to pick a location (by tapping on the map) first!');
+      return;
+    }
+
+    setMapPin(null);
+    setMapReady(false);
+    // @ts-ignore
+    navigation.navigate('AddPlace', { pin: mapPin });
+  }, [navigation, mapPin]);
+
+  useLayoutEffect(() => {
+    if (route.name === 'Map') {
+      navigation.setOptions({
+        // @ts-ignore
+        headerRight: ({ tintColor }) => (
+          <IconButton
+            icon="content-save"
+            iconColor={tintColor}
+            size={24}
+            onPress={savePickedLocation}
+          />
+        )
+      });
+    }
+  }, [route.name, navigation, savePickedLocation]);
+
+  useEffect(() => {
+    setTimeout(() => setMapReady(true), 700);
+  }, [route?.name]);
+
+  useEffect(() => {
+    Animated.timing(opacityAnimation, {
+      toValue: isMapReady ? 1 : 0,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, [isMapReady, route?.name]);
+
   return (
-    <View style={styles.page}>
-      <View style={styles.container}>
+    <View style={[styles.page, !isMapReady && { backgroundColor: paletteTheme.grey[50] }]}>
+      <Animated.View style={[styles.container, { opacity: opacityAnimation }]}>
         <MapboxGL.MapView
           style={styles.map}
           styleURL={process.env.MAPBOX_STYLE_URL}
           onTouchStart={handleMapInteraction}
-          onPress={handleMapPress}
+          onPress={route.name === 'Map' ? handleMapPress : undefined}
+          // onLongPress={route.name === 'Map' ? handleMapPress : undefined}
         >
           <MapboxGL.UserLocation
             onUpdate={onUserLocationUpdate}
@@ -76,7 +127,7 @@ export const Map: FC<{ pins?: Pin[] }> = ({ pins = [] }) => {
           {/*  <MapboxGL.FillLayer id="boundsFill" style={boundsStyle} />*/}
           {/*</MapboxGL.ShapeSource>*/}
 
-          {[...mapPins, ...pins]?.map((pin, index) => (
+          {pins?.map((pin, index) => (
             <MapboxGL.PointAnnotation
               id={String(index)}
               key={index.toString()}
@@ -84,9 +135,24 @@ export const Map: FC<{ pins?: Pin[] }> = ({ pins = [] }) => {
               coordinate={[pin.longitude, pin.latitude]}
               onSelected={() => handlePinSelect(pin)}
             >
-              <MaterialIcons name="location-pin" size={30} color="red" />
+              <View>
+                <MaterialIcons name="location-pin" size={30} color="red" />
+              </View>
             </MapboxGL.PointAnnotation>
           ))}
+
+          {!!mapPin && (
+            <MapboxGL.PointAnnotation
+              id="userLocation"
+              anchor={{ x: 0.5, y: 0.5 }}
+              coordinate={[mapPin.longitude, mapPin.latitude]}
+              onSelected={() => handlePinSelect(mapPin)}
+            >
+              <View>
+                <MaterialIcons name="location-pin" size={30} color="blue" />
+              </View>
+            </MapboxGL.PointAnnotation>
+          )}
 
           {!!selectedPin && (
             <MapboxGL.MarkerView
@@ -123,7 +189,26 @@ export const Map: FC<{ pins?: Pin[] }> = ({ pins = [] }) => {
             </MapboxGL.MarkerView>
           )}
         </MapboxGL.MapView>
-      </View>
+      </Animated.View>
+
+      {!!pins?.length && (
+        <IconButton
+          animated
+          mode="contained"
+          icon="delete-outline"
+          size={30}
+          style={[
+            styles.deleteButton,
+            {
+              bottom: route.name === 'Map' ? 35 : 0,
+              right: route.name === 'Map' ? 10 : 0,
+            }
+          ]}
+          containerColor={paletteTheme?.error?.main}
+          iconColor={paletteTheme?.error?.container}
+          onPress={handleDeleteLastPin}
+        />
+      )}
     </View>
   );
 };
@@ -133,6 +218,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
   },
   container: {
     flex: 1,
@@ -140,5 +226,8 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1
+  },
+  deleteButton: {
+    position: 'absolute',
   }
 });

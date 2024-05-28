@@ -6,7 +6,7 @@ import { PaletteColorType, Theme, ThemeColor, themeColor } from '../../theme';
 type GlobalContextType = {
   globalTheme: ThemeColor;
   palette: PaletteColorType;
-  paletteTheme: Omit<Theme['palette'], ThemeColor>
+  paletteTheme: Theme['palette'];
   updateTheme: (val: ThemeColor) => void;
 };
 

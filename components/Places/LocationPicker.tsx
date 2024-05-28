@@ -1,18 +1,22 @@
-import { FC, useState } from 'react';
+import { FC, useEffect } from 'react';
 import { View, Alert, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { getCurrentPositionAsync, useForegroundPermissions, PermissionStatus } from 'expo-location';
-import { LocationObject } from 'expo-location/src/Location.types';
 
+import { Pin, useMap } from '../../store/MapProvider';
 import { Map } from '../../screens/Map';
 import { Button } from '../Button';
+import { Text } from '../Text';
+import { useGlobalTheme } from '../../store';
 
 export const LocationPicker: FC = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const isFocused = useIsFocused();
   const [locationPermissionInfo, requestPermission] = useForegroundPermissions();
-  const [location, setLocation] = useState<LocationObject | null>(null);
+  const { pins, updatePins, deletePin } = useMap();
+  const { paletteTheme } = useGlobalTheme();
 
-  console.log(location);
   const verifyPermission = async () => {
     if (locationPermissionInfo?.status === PermissionStatus.UNDETERMINED) {
       const permissionRes = await requestPermission();
@@ -38,18 +42,30 @@ export const LocationPicker: FC = () => {
 
     const location = await getCurrentPositionAsync();
 
-    setLocation(location);
+    updatePins(location?.coords);
   };
 
   const pickOnMapHandler = () => {
     // @ts-ignore
     navigation.navigate('Map');
+    deletePin();
   };
+
+  useEffect(() => {
+    if (isFocused && route?.params) {
+      // @ts-ignore
+      updatePins(route?.params?.pin as Pin);
+    }
+  }, [isFocused, route]);
 
   return (
     <View>
-      <View style={styles.mapContainer}>
-        <Map pins={!location ? [] : [location?.coords]} />
+      <View style={[styles.mapContainer, { backgroundColor: paletteTheme.grey[50], borderRadius: paletteTheme.borderRadius }]}>
+        {pins?.length > 0 ? (
+          <Map />
+        ) : (
+          <Text>No location picked yet.</Text>
+        )}
       </View>
 
       <View style={styles.buttonsGroup}>
@@ -68,6 +84,10 @@ export const LocationPicker: FC = () => {
 const styles = StyleSheet.create({
   mapContainer: {
     height: 300,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   buttonsGroup: {
     flexDirection: 'row',
