@@ -1,12 +1,11 @@
-import { FC, useState, useEffect, useLayoutEffect, useCallback } from 'react';
-import { View, StyleSheet, Animated, Alert } from 'react-native';
-import MapboxGL, { UserTrackingMode } from '@rnmapbox/maps';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { FC, useState, useEffect, useRef } from 'react';
+import { View, StyleSheet } from 'react-native';
+import MapboxGL, { PointAnnotation, UserTrackingMode, Camera, MarkerView, MapView, UserLocation } from '@rnmapbox/maps';
 import { IconButton } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Text } from '../components';
-import { useGlobalTheme } from '../store';
-import { useMap } from '../store/MapProvider';
+
+import { useGlobalTheme, Pin, useMap } from '../../store';
+import { Text } from '../Text';
 // import bboxPolygon from '@turf/bbox-polygon';
 
 MapboxGL.setAccessToken(`${process.env.MAPBOX_PUBLIC_API_KEY}`);
@@ -24,21 +23,17 @@ MapboxGL.setAccessToken(`${process.env.MAPBOX_PUBLIC_API_KEY}`);
 // const { ne, sw } = bounds;
 // const polygon = bboxPolygon([sw[0], sw[1], ne[0], ne[1]]);
 
-
-interface Pin {
-  latitude: number;
-  longitude: number;
+interface MapProps {
+  mapPin?: Pin | null;
+  isMapPage?: boolean;
+  setMapPin?: (pin: Pin) => void;
 }
 
-export const Map: FC = () => {
-  const route = useRoute();
-  const navigation = useNavigation();
+export const Map: FC <MapProps> = ({ isMapPage = false, mapPin, setMapPin }) => {
+  const pointAnnotation = useRef<PointAnnotation>(null);
   const { pins, deletePin, onUserLocationUpdate } = useMap();
-  const [mapPin, setMapPin] = useState<Pin | null>(null);
   const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
   const { paletteTheme } = useGlobalTheme();
-  const [isMapReady, setMapReady] = useState(false);
-  const [opacityAnimation] = useState(new Animated.Value(0));
 
   const handlePinSelect = (pin: Pin) => {
     setSelectedPin(pin);
@@ -49,13 +44,13 @@ export const Map: FC = () => {
   };
 
   const handleMapPress = (event: any) => {
-    const {geometry: {coordinates}} = event;
+    const { geometry: {coordinates} } = event;
     const newPin: Pin = {
       latitude: coordinates[1],
       longitude: coordinates[0]
     }
 
-    setMapPin(newPin);
+    setMapPin?.(newPin);
   };
 
   const handleDeleteLastPin = () => {
@@ -63,61 +58,25 @@ export const Map: FC = () => {
     setSelectedPin(null);
   };
 
-  const savePickedLocation = useCallback(() => {
-    if (!mapPin) {
-      Alert.alert('No location picked!', 'You have to pick a location (by tapping on the map) first!');
-      return;
-    }
-
-    setMapPin(null);
-    setMapReady(false);
-    // @ts-ignore
-    navigation.navigate('AddPlace', { pin: mapPin });
-  }, [navigation, mapPin]);
-
-  useLayoutEffect(() => {
-    if (route.name === 'Map') {
-      navigation.setOptions({
-        // @ts-ignore
-        headerRight: ({ tintColor }) => (
-          <IconButton
-            icon="content-save"
-            iconColor={tintColor}
-            size={24}
-            onPress={savePickedLocation}
-          />
-        )
-      });
-    }
-  }, [route.name, navigation, savePickedLocation]);
-
   useEffect(() => {
-    setTimeout(() => setMapReady(true), 700);
-  }, [route?.name]);
-
-  useEffect(() => {
-    Animated.timing(opacityAnimation, {
-      toValue: isMapReady ? 1 : 0,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, [isMapReady, route?.name]);
+    if (mapPin) {
+      pointAnnotation.current?.refresh();
+    }
+  }, [mapPin]);
 
   return (
-    <View style={[styles.page, !isMapReady && { backgroundColor: paletteTheme.grey[50] }]}>
-      <Animated.View style={[styles.container, { opacity: opacityAnimation }]}>
-        <MapboxGL.MapView
+    <View style={styles.page}>
+      <View style={styles.container}>
+        <MapView
           style={styles.map}
           styleURL={process.env.MAPBOX_STYLE_URL}
           onTouchStart={handleMapInteraction}
-          onPress={route.name === 'Map' ? handleMapPress : undefined}
-          // onLongPress={route.name === 'Map' ? handleMapPress : undefined}
+          onPress={isMapPage ? handleMapPress : undefined}
+          // onLongPress={route.name === 'MapScreen' ? handleMapPress : undefined}
         >
-          <MapboxGL.UserLocation
-            onUpdate={onUserLocationUpdate}
-          />
+          <UserLocation onUpdate={onUserLocationUpdate} />
 
-          <MapboxGL.Camera
+          <Camera
             followZoomLevel={16}
             followUserLocation
             followUserMode={UserTrackingMode.Follow}
@@ -127,8 +86,8 @@ export const Map: FC = () => {
           {/*  <MapboxGL.FillLayer id="boundsFill" style={boundsStyle} />*/}
           {/*</MapboxGL.ShapeSource>*/}
 
-          {pins?.map((pin, index) => (
-            <MapboxGL.PointAnnotation
+          {!mapPin && pins?.map((pin, index) => (
+            <PointAnnotation
               id={String(index)}
               key={index.toString()}
               anchor={{ x: 0.5, y: 0.5 }}
@@ -138,24 +97,29 @@ export const Map: FC = () => {
               <View>
                 <MaterialIcons name="location-pin" size={30} color="red" />
               </View>
-            </MapboxGL.PointAnnotation>
+            </PointAnnotation>
           ))}
 
-          {!!mapPin && (
-            <MapboxGL.PointAnnotation
+          {!!mapPin?.longitude && (
+            <PointAnnotation
+              ref={pointAnnotation}
               id="userLocation"
               anchor={{ x: 0.5, y: 0.5 }}
               coordinate={[mapPin.longitude, mapPin.latitude]}
               onSelected={() => handlePinSelect(mapPin)}
             >
               <View>
-                <MaterialIcons name="location-pin" size={30} color="blue" />
+                <MaterialIcons
+                  name="location-pin"
+                  size={30}
+                  color="blue"
+                />
               </View>
-            </MapboxGL.PointAnnotation>
+            </PointAnnotation>
           )}
 
           {!!selectedPin && (
-            <MapboxGL.MarkerView
+            <MarkerView
               id="tooltip-view"
               coordinate={[selectedPin.longitude, selectedPin.latitude]}
               anchor={{ x: 0.5, y: 1 }}
@@ -186,10 +150,10 @@ export const Map: FC = () => {
                   }}
                 />
               </View>
-            </MapboxGL.MarkerView>
+            </MarkerView>
           )}
-        </MapboxGL.MapView>
-      </Animated.View>
+        </MapView>
+      </View>
 
       {!!pins?.length && (
         <IconButton
@@ -200,8 +164,8 @@ export const Map: FC = () => {
           style={[
             styles.deleteButton,
             {
-              bottom: route.name === 'Map' ? 35 : 0,
-              right: route.name === 'Map' ? 10 : 0,
+              bottom: isMapPage ? 35 : 0,
+              right: isMapPage ? 10 : 0,
             }
           ]}
           containerColor={paletteTheme?.error?.main}

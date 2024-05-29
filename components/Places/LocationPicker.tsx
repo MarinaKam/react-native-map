@@ -3,18 +3,17 @@ import { View, Alert, StyleSheet } from 'react-native';
 import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { getCurrentPositionAsync, useForegroundPermissions, PermissionStatus } from 'expo-location';
 
-import { Pin, useMap } from '../../store/MapProvider';
-import { Map } from '../../screens/Map';
+import { Pin, useMap, useGlobalTheme } from '../../store';
 import { Button } from '../Button';
 import { Text } from '../Text';
-import { useGlobalTheme } from '../../store';
+import { Map } from '../Map';
 
 export const LocationPicker: FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const isFocused = useIsFocused();
   const [locationPermissionInfo, requestPermission] = useForegroundPermissions();
-  const { pins, updatePins, deletePin } = useMap();
+  const { pins, updatePins } = useMap();
   const { paletteTheme } = useGlobalTheme();
 
   const verifyPermission = async () => {
@@ -47,8 +46,7 @@ export const LocationPicker: FC = () => {
 
   const pickOnMapHandler = () => {
     // @ts-ignore
-    navigation.navigate('Map');
-    deletePin();
+    navigation.navigate('MapScreen');
   };
 
   useEffect(() => {
@@ -93,7 +91,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 80,
+    paddingBottom: 50,
   },
   button: {
     width: '48%',
