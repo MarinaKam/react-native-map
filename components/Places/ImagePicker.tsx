@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Alert, Image, StyleSheet, View } from 'react-native';
 import {
   PermissionStatus,
@@ -13,11 +13,15 @@ import { Text } from '../Text';
 import { useGlobalTheme } from '../../store';
 import { Button } from '../Button';
 
-export const ImagePicker: FC = () => {
+interface ImagePickerI {
+  pickedImage: ImagePickerAsset | null;
+  setPickedImage: (image: ImagePickerAsset | null) => void;
+}
+
+export const ImagePicker: FC<ImagePickerI> = ({ pickedImage, setPickedImage }) => {
   const { paletteTheme } = useGlobalTheme();
   const [cameraPermissionInfo, requestPermission] = useCameraPermissions();
   const [libraryPermissionInfo, requestLibraryPermission] = useMediaLibraryPermissions();
-  const [pickedImage, setPickedImage] = useState<ImagePickerAsset | null>(null);
 
   const verifyPermission = async () => {
     if (cameraPermissionInfo && cameraPermissionInfo.status === PermissionStatus.UNDETERMINED) {

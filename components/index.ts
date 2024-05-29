@@ -4,3 +4,4 @@ export * from './ShadowView';
 export * from './fields';
 export * from './Places';
 export * from './Button';
+export * from './Map';
