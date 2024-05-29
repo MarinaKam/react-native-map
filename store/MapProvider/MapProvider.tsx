@@ -4,6 +4,11 @@ import { Location } from '@rnmapbox/maps';
 export interface Pin {
   latitude: number;
   longitude: number;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  address: string | null
 }
 
 type MapContextType = {

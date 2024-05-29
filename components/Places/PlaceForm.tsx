@@ -1,30 +1,55 @@
 import { FC, useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ImagePickerAsset } from 'expo-image-picker/src/ImagePicker.types';
 
-import { useGlobalTheme, useMap } from '../../store';
+import { Pin, useGlobalTheme, useMap } from '../../store';
+import { PlaceType } from '../../models/place';
 import { Text } from '../Text';
 import { ImagePicker } from './ImagePicker';
 import { LocationPicker } from './LocationPicker';
 import { Button } from '../Button';
-import { ImagePickerAsset } from 'expo-image-picker/src/ImagePicker.types';
 
-interface PlaceFormInterface {}
+interface PlaceFormInterface {
+  onCreatePlace: (val: PlaceType) => void;
+}
 
-export const PlaceForm: FC<PlaceFormInterface> = () => {
+export const PlaceForm: FC<PlaceFormInterface> = ({ onCreatePlace }) => {
   const { palette, paletteTheme } = useGlobalTheme();
   const { pins } = useMap();
   const [titleVal, setTitleVal] = useState<string>('');
+  const [titleError, setTitleError] = useState<boolean>(false);
   const [pickedImage, setPickedImage] = useState<ImagePickerAsset | null>(null);
 
   const handleChangeTitle = (val: string) => {
-    setTitleVal(val);
+    setTitleError(false);
+    setTitleVal(val.trim());
   };
 
-  const handleSave = () => {
-    console.log('pins', pins)
-    console.log('pickedImage', pickedImage)
+  const handleSave = async () => {
+    if (!titleVal) {
+      setTitleError(true);
+      Alert.alert('No title entered!', 'You have to enter a title of location!');
+      return;
+    }
+
+    if (!pickedImage) {
+      Alert.alert('No image selected!', 'You have to select an image!');
+      return;
+    }
+
+    if (!pins?.[0]) {
+      Alert.alert('No location picked!', 'You have to pick a location!');
+      return;
+    }
+
+    onCreatePlace({
+      address: pins?.[0]?.address,
+      location: pins?.[0]?.location,
+      title: titleVal,
+      imageUri: pickedImage?.uri
+    })
   };
 
   return (
@@ -36,6 +61,7 @@ export const PlaceForm: FC<PlaceFormInterface> = () => {
           <TextInput
             value={titleVal}
             mode="outlined"
+            error={titleError}
             activeOutlineColor={palette.dark}
             outlineColor={palette.main}
             cursorColor={palette.main}

@@ -1,10 +1,11 @@
 import { FC, useState, useEffect, useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import MapboxGL, { PointAnnotation, UserTrackingMode, Camera, MarkerView, MapView, UserLocation } from '@rnmapbox/maps';
 import { IconButton } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import { useGlobalTheme, Pin, useMap } from '../../store';
+import { reverseGeocoding } from '../../utils';
 import { Text } from '../Text';
 // import bboxPolygon from '@turf/bbox-polygon';
 
@@ -43,14 +44,33 @@ export const Map: FC <MapProps> = ({ isMapPage = false, mapPin, setMapPin }) => 
     setSelectedPin(null);
   };
 
-  const handleMapPress = (event: any) => {
-    const { geometry: {coordinates} } = event;
-    const newPin: Pin = {
+  const handleMapPress = async (event: any) => {
+    const { geometry: { coordinates } } = event;
+    const newPin: Pin['location'] = {
       latitude: coordinates[1],
       longitude: coordinates[0]
-    }
+    };
 
-    setMapPin?.(newPin);
+    try {
+      const response = await reverseGeocoding(newPin);
+
+      if (response) {
+        const { address = null } = response;
+
+        setMapPin?.({
+          latitude: newPin.latitude,
+          longitude: newPin.longitude,
+          location: newPin,
+          address
+        });
+      } else {
+        Alert.alert('Error', 'Failed to fetch address!');
+        console.error('reverseGeocoding returned undefined');
+      }
+    } catch(error) {
+      console.error(`Error with geocoding request: ${error}`);
+      Alert.alert('Error', 'Failed to fetch address!');
+    }
   };
 
   const handleDeleteLastPin = () => {

@@ -7,6 +7,7 @@ import { Pin, useMap, useGlobalTheme } from '../../store';
 import { Button } from '../Button';
 import { Text } from '../Text';
 import { Map } from '../Map';
+import { reverseGeocoding } from '../../utils';
 
 export const LocationPicker: FC = () => {
   const navigation = useNavigation();
@@ -41,7 +42,25 @@ export const LocationPicker: FC = () => {
 
     const location = await getCurrentPositionAsync();
 
-    updatePins(location?.coords);
+    try {
+      const response = await reverseGeocoding(location?.coords);
+
+      if (response) {
+        const { address = null } = response;
+
+        updatePins({
+          ...location?.coords,
+          location: location?.coords,
+          address
+        });
+      } else {
+        Alert.alert('Error', 'Failed to fetch address!');
+        console.error('reverseGeocoding returned undefined');
+      }
+    } catch(error) {
+      console.error(`Error with geocoding request: ${error}`);
+      Alert.alert('Error', 'Failed to fetch address!');
+    }
   };
 
   const pickOnMapHandler = () => {
