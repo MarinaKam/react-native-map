@@ -22,3 +22,4 @@ eas secret:create --name="MAPBOX_STYLE_URL" --value="$(grep 'MAPBOX_STYLE_URL' .
 ### Check dependencies versions errors
 `npx expo install --check`
 
+`npx expo-doctor`

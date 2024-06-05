@@ -15,7 +15,7 @@ export const PlaceItem: FC<PlaceItemProps> = ({ place, onSelect }) => {
   const theme: Theme = useTheme();
 
   return (
-    <ShadowView style={[styles.item]}>
+    <ShadowView>
       <Pressable
         style={({ pressed }) => [
           styles.item,
@@ -41,6 +41,7 @@ export const PlaceItem: FC<PlaceItemProps> = ({ place, onSelect }) => {
 
 const styles = StyleSheet.create({
   item: {
+    borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'flex-start',
     backgroundColor: 'white',
