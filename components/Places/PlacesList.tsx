@@ -15,9 +15,10 @@ type NavProp = NavigationProp<RootStackParamList, 'PlaceDetails'>;
 export const PlacesList: FC<PlacesListProps> = ({ places = [] }) => {
   const navigation = useNavigation<NavProp>();
 
-  const selectPlaceHandler = (id: string) => {
-    navigation.navigate('PlaceDetails', { placeId: id });
+  const selectPlaceHandler = (id: number) => {
+    navigation.navigate('PlaceDetails', { placeId: `${id}` });
   }
+
   return !places?.length ? (
     <View style={styles.emptyContainer}>
       <Text textAlign="center" variant="titleMedium">No places added yet</Text>
@@ -25,7 +26,7 @@ export const PlacesList: FC<PlacesListProps> = ({ places = [] }) => {
   ) : (
     <FlatList
       data={places}
-      keyExtractor={(item) => item?.id}
+      keyExtractor={(item) => `${item?.id}`}
       renderItem={({ item }) => <PlaceItem place={item} onSelect={selectPlaceHandler} />}
     />
   );

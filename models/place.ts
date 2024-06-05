@@ -10,23 +10,32 @@ export type PlaceType = {
   location: Location;
 }
 
+export type PlaceResType = {
+  title: string;
+  imageUri?: string;
+  address: string | null;
+  location: Location;
+  id: number;
+}
+
 export class Place {
   title: string;
   imageUri: string;
   address: string | null;
   location: Location;
-  id: string;
+  id: number;
 
   constructor({
     title,
     imageUri,
     address,
     location,
-  }: PlaceType) {
+    id
+  }: PlaceResType) {
     this.title = title;
     this.imageUri = imageUri ?? '';
     this.address = address;
     this.location = location;
-    this.id = new Date().toString() + Math.random().toString();
+    this.id = id;
   }
 }

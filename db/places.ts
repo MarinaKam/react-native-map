@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite/next';
-import { Place } from '../models/place';
+import { Place, PlaceType } from '../models/place';
 
 let db: SQLite.SQLiteDatabase;
 
@@ -34,7 +34,8 @@ export const getPlaces = async (): Promise<Place[]> => {
       location: {
         latitude: (row as any).latitude,
         longitude: (row as any).longitude,
-      }
+      },
+      id: (row as any).id
     }));
   } catch (error) {
     console.error(`An error occurred while fetching places: ${error}`);
@@ -42,7 +43,33 @@ export const getPlaces = async (): Promise<Place[]> => {
   }
 };
 
-export const addPlace = async (place: Place): Promise<Place> => {
+export const getPlace = async (id: string): Promise<Place> => {
+  try {
+    const statement = await db.prepareAsync('SELECT * FROM places WHERE id = ?');
+    const result = await statement.executeAsync(id);
+    const row = await result.getFirstAsync();
+
+    if (row) {
+      return new Place({
+        title: (row as any).title,
+        imageUri: (row as any).imageUri,
+        address: (row as any).address,
+        location: {
+          latitude: (row as any).latitude,
+          longitude: (row as any).longitude,
+        },
+        id: (row as any).id
+      });
+    }
+
+    throw new Error(`No place found with id:${id}`);
+  } catch (error) {
+    console.error(`An error occurred while fetching the place with id:${id}. ${error}`);
+    throw error;
+  }
+};
+
+export const addPlace = async (place: PlaceType): Promise<Place> => {
   const statement = await db.prepareAsync(`
     INSERT INTO places (title, imageUri, address, latitude, longitude)
     VALUES (?, ?, ?, ?, ?)
@@ -69,7 +96,8 @@ export const addPlace = async (place: Place): Promise<Place> => {
         location: {
           latitude: (row as any).latitude,
           longitude: (row as any).longitude,
-        }
+        },
+        id: (row as any).id
       });
     }
 

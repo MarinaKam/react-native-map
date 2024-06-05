@@ -8,7 +8,7 @@ import { Theme } from '../../theme';
 
 type PlaceItemProps = {
   place: Place;
-  onSelect: (id: string) => void;
+  onSelect: (id: number) => void;
 }
 
 export const PlaceItem: FC<PlaceItemProps> = ({ place, onSelect }) => {

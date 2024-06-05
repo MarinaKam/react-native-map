@@ -69,7 +69,11 @@ export const StackNavigation = () => {
         />
 
         <Stack.Screen name="MapScreen" component={MapScreen} />
-        <Stack.Screen name="PlaceDetails" component={PlaceDetails} />
+        <Stack.Screen
+          name="PlaceDetails"
+          component={PlaceDetails}
+          options={{ title: 'Loading Place...' }}
+        />
       </Stack.Group>
 
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
