@@ -4,7 +4,7 @@ import { TextInput } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ImagePickerAsset } from 'expo-image-picker/src/ImagePicker.types';
 
-import { Pin, useGlobalTheme, useMap } from '../../store';
+import { useGlobalTheme, useMap } from '../../store';
 import { PlaceType } from '../../models/place';
 import { Text } from '../Text';
 import { ImagePicker } from './ImagePicker';
@@ -24,12 +24,13 @@ export const PlaceForm: FC<PlaceFormInterface> = ({ onCreatePlace }) => {
 
   const handleChangeTitle = (val: string) => {
     setTitleError(false);
-    setTitleVal(val.trim());
+    setTitleVal(val);
   };
 
   const handleSave = async () => {
-    if (!titleVal) {
+    if (!titleVal.trim()) {
       setTitleError(true);
+      setTitleVal('');
       Alert.alert('No title entered!', 'You have to enter a title of location!');
       return;
     }

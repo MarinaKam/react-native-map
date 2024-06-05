@@ -15,8 +15,8 @@ export const ShadowView: FC<ShadowViewProps> = ({ children, style }) => {
     <View
       style={[
         styles.container,
-        { shadowColor: theme.palette.primary.main },
-        style
+        { shadowColor: theme.palette.text.primary },
+        ...(style || [])
       ]}
     >
       {children}
@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     borderRadius: 8,
-    elevation: 4,
+    elevation: 2,
     marginVertical: 8,
     marginHorizontal: 18,
     overflow: Platform.OS === 'android' ? 'hidden' : 'visible',
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
       width: 1,
       height: 1,
     },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
 });

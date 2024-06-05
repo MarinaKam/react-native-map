@@ -4,11 +4,19 @@ import { IconButton, Button } from 'react-native-paper';
 import { AllPlaces } from '../screens/AllPlaces';
 import { AddPlace } from '../screens/AddPlace';
 import { Settings } from '../screens/Settings';
-import { useGlobalTheme } from '../store';
+import { Pin, useGlobalTheme } from '../store';
 import { theme } from '../theme';
 import { MapScreen } from '../screens/MapScreen';
+import { Place } from '../models/place';
 
-const Stack = createNativeStackNavigator();
+export type RootStackParamList = {
+  AllPlaces: { place?: Place };
+  AddPlace: { pin: Pin };
+  MapScreen: undefined;
+  Settings: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const StackNavigation = () => {
   const { paletteTheme, palette } = useGlobalTheme();

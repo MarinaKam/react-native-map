@@ -1,13 +1,16 @@
 import { FC, useState, useLayoutEffect, useCallback } from 'react';
 import { Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { IconButton } from 'react-native-paper';
 
 import { Map } from '../components';
 import { Pin } from '../store';
+import { RootStackParamList } from '../navigation';
+
+type NavProp = NavigationProp<RootStackParamList, 'AddPlace'>;
 
 export const MapScreen: FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavProp>();
   const [mapPin, setMapPin] = useState<Pin | null>(null);
 
   const savePickedLocation = useCallback(() => {
@@ -17,7 +20,6 @@ export const MapScreen: FC = () => {
     }
 
     setMapPin(null);
-    // @ts-ignore
     navigation.navigate('AddPlace', { pin: mapPin });
   }, [navigation, mapPin]);
 

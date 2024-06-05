@@ -1,17 +1,21 @@
 import { FC, useEffect } from 'react';
 import { View, Alert, StyleSheet } from 'react-native';
-import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { NavigationProp, RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { getCurrentPositionAsync, useForegroundPermissions, PermissionStatus } from 'expo-location';
 
-import { Pin, useMap, useGlobalTheme } from '../../store';
+import { useMap, useGlobalTheme } from '../../store';
 import { Button } from '../Button';
 import { Text } from '../Text';
 import { Map } from '../Map';
 import { reverseGeocoding } from '../../utils';
+import { RootStackParamList } from '../../navigation';
+
+type NavProp = NavigationProp<RootStackParamList, 'MapScreen'>;
+type AddPlaceRoute = RouteProp<RootStackParamList, 'AddPlace'>;
 
 export const LocationPicker: FC = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
+  const navigation = useNavigation<NavProp>();
+  const route = useRoute<AddPlaceRoute>();
   const isFocused = useIsFocused();
   const [locationPermissionInfo, requestPermission] = useForegroundPermissions();
   const { pins, updatePins } = useMap();
@@ -64,14 +68,12 @@ export const LocationPicker: FC = () => {
   };
 
   const pickOnMapHandler = () => {
-    // @ts-ignore
     navigation.navigate('MapScreen');
   };
 
   useEffect(() => {
     if (isFocused && route?.params) {
-      // @ts-ignore
-      updatePins(route?.params?.pin as Pin);
+      updatePins(route?.params?.pin);
     }
   }, [isFocused, route]);
 
