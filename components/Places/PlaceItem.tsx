@@ -8,20 +8,20 @@ import { Theme } from '../../theme';
 
 type PlaceItemProps = {
   place: Place;
-  onSelect?: () => void;
+  onSelect: (id: number) => void;
 }
 
 export const PlaceItem: FC<PlaceItemProps> = ({ place, onSelect }) => {
   const theme: Theme = useTheme();
 
   return (
-    <ShadowView style={[styles.item]}>
+    <ShadowView>
       <Pressable
         style={({ pressed }) => [
           styles.item,
           pressed ? styles.itemPressed : null
         ]}
-        onPress={onSelect}
+        onPress={() => onSelect(place.id)}
       >
         <Image source={{ uri: place?.imageUri }} style={styles.image} />
 
@@ -41,6 +41,7 @@ export const PlaceItem: FC<PlaceItemProps> = ({ place, onSelect }) => {
 
 const styles = StyleSheet.create({
   item: {
+    borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'flex-start',
     backgroundColor: 'white',
