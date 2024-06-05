@@ -23,7 +23,24 @@ export const init = async (): Promise<void> => {
   }
 };
 
-export const getPlaces = async (id: string): Promise<void> => {}
+export const getPlaces = async (): Promise<Place[]> => {
+  try {
+    const allPlaces = await db.getAllAsync('SELECT * FROM places');
+
+    return allPlaces.map(row => new Place({
+      title: (row as any).title,
+      imageUri: (row as any).imageUri,
+      address: (row as any).address,
+      location: {
+        latitude: (row as any).latitude,
+        longitude: (row as any).longitude,
+      }
+    }));
+  } catch (error) {
+    console.error(`An error occurred while fetching places: ${error}`);
+    throw error;
+  }
+};
 
 export const addPlace = async (place: Place): Promise<Place> => {
   const statement = await db.prepareAsync(`
@@ -45,16 +62,15 @@ export const addPlace = async (place: Place): Promise<Place> => {
     console.log('lastInsertRowId:', result.lastInsertRowId);
 
     for await (const row of result) {
-      newPlace = {
-        id: (row as any).id,
+      newPlace = new Place({
         title: (row as any).title,
         imageUri: (row as any).imageUri,
         address: (row as any).address,
         location: {
           latitude: (row as any).latitude,
           longitude: (row as any).longitude,
-        },
-      };
+        }
+      });
     }
 
     if (typeof newPlace === 'undefined') {

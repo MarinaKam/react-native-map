@@ -11,10 +11,10 @@ export const AddPlace = () => {
   const handleCreatePlace = async (val: PlaceType) => {
     const place = new Place(val);
 
-    await addPlace(place).then((result) => {
+    await addPlace(place).then(() => {
       deletePin();
       // @ts-ignore
-      navigation.navigate('AllPlaces', { place });
+      navigation.navigate('AllPlaces');
     });
   };
 

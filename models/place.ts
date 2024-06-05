@@ -3,10 +3,6 @@ type Location = {
   longitude: number;
 };
 
-export type AllPlacesRouteProps = {
-  place: PlaceType;
-}
-
 export type PlaceType = {
   title: string;
   imageUri?: string;

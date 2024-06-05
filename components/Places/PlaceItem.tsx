@@ -8,7 +8,7 @@ import { Theme } from '../../theme';
 
 type PlaceItemProps = {
   place: Place;
-  onSelect?: () => void;
+  onSelect: (id: string) => void;
 }
 
 export const PlaceItem: FC<PlaceItemProps> = ({ place, onSelect }) => {
@@ -21,7 +21,7 @@ export const PlaceItem: FC<PlaceItemProps> = ({ place, onSelect }) => {
           styles.item,
           pressed ? styles.itemPressed : null
         ]}
-        onPress={onSelect}
+        onPress={() => onSelect(place.id)}
       >
         <Image source={{ uri: place?.imageUri }} style={styles.image} />
 

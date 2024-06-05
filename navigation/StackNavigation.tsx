@@ -8,10 +8,12 @@ import { Pin, useGlobalTheme } from '../store';
 import { theme } from '../theme';
 import { MapScreen } from '../screens/MapScreen';
 import { Place } from '../models/place';
+import { PlaceDetails } from '../screens/PlaceDetails';
 
 export type RootStackParamList = {
   AllPlaces: { place?: Place };
   AddPlace: { pin: Pin };
+  PlaceDetails: { placeId: string };
   MapScreen: undefined;
   Settings: undefined;
 };
@@ -67,6 +69,7 @@ export const StackNavigation = () => {
         />
 
         <Stack.Screen name="MapScreen" component={MapScreen} />
+        <Stack.Screen name="PlaceDetails" component={PlaceDetails} />
       </Stack.Group>
 
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
